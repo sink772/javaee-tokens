@@ -1,2 +1,2 @@
 rootProject.name = 'javaee-tokens'
-include 'tokens'
+include 'tokens', 'testsvc'
