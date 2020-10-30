@@ -29,7 +29,7 @@ public abstract class IRC2Basic implements IRC2 {
     private final String name;
     private final String symbol;
     private final int decimals;
-    private final BigInteger totalSupply;
+    private BigInteger totalSupply;
     private final DictDB<Address, BigInteger> balances;
 
     public IRC2Basic(String _name, String _symbol, BigInteger _decimals, BigInteger _initialSupply) {
@@ -114,8 +114,18 @@ public abstract class IRC2Basic implements IRC2 {
         Transfer(_from, _to, _value, dataBytes);
     }
 
+    /**
+     * Destroys `amount` tokens from `owner`, reducing the total supply.
+     */
     protected void _burn(Address owner, BigInteger amount) {
-        // TODO: burn
+        final Address zeroAddress = new Address(new byte[Address.LENGTH]);
+        Context.require(!zeroAddress.equals(owner));
+        Context.require(amount.compareTo(BigInteger.ZERO) >= 0);
+        Context.require(safeGetBalance(owner).compareTo(amount) >= 0);
+
+        safeSetBalance(owner, safeGetBalance(owner).subtract(amount));
+        this.totalSupply = this.totalSupply.subtract(amount);
+        Transfer(owner, zeroAddress, amount, "burn".getBytes());
     }
 
     private BigInteger safeGetBalance(Address owner) {

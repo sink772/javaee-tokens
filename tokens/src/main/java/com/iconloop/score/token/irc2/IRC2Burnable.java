@@ -26,6 +26,9 @@ public abstract class IRC2Burnable extends IRC2Basic {
         super(_name, _symbol, _decimals, _initialSupply);
     }
 
+    /**
+     * Destroys `_amount` tokens from the caller.
+     */
     @External
     public void burn(BigInteger _amount) {
         _burn(Context.getCaller(), _amount);
