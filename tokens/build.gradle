@@ -16,6 +16,11 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
 
+compileJava {
+    // need to add this option to retrieve formal parameter names
+    options.compilerArgs += ['-parameters']
+}
+
 test {
     useJUnitPlatform()
 }
