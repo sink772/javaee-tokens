@@ -22,6 +22,7 @@ import com.iconloop.testsvc.ServiceManager;
 import com.iconloop.testsvc.TestBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import score.Context;
 
 import java.math.BigInteger;
 
@@ -40,15 +41,16 @@ class IRC2BasicTest extends TestBase {
     private static Score tokenScore;
 
     public static class IRC2BasicToken extends IRC2Basic {
-        public IRC2BasicToken(String _name, String _symbol, BigInteger _decimals, BigInteger _initialSupply) {
-            super(_name, _symbol, _decimals, _initialSupply);
+        public IRC2BasicToken(String _name, String _symbol, int _decimals, BigInteger _totalSupply) {
+            super(_name, _symbol, _decimals);
+            _mint(Context.getCaller(), _totalSupply);
         }
     }
 
     @BeforeAll
     public static void setup() throws Exception {
         tokenScore = sm.deploy(owner, IRC2BasicToken.class,
-                name, symbol, BigInteger.valueOf(decimals), initialSupply);
+                name, symbol, decimals, totalSupply);
         owner.addBalance(symbol, totalSupply);
     }
 

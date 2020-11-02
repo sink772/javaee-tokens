@@ -23,6 +23,7 @@ import com.iconloop.testsvc.TestBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import score.Address;
+import score.Context;
 
 import java.math.BigInteger;
 
@@ -44,15 +45,16 @@ public class IRC2BurnableTest extends TestBase {
     private static IRC2BurnableToken tokenSpy;
 
     public static class IRC2BurnableToken extends IRC2Burnable {
-        public IRC2BurnableToken(String _name, String _symbol, BigInteger _decimals, BigInteger _initialSupply) {
-            super(_name, _symbol, _decimals, _initialSupply);
+        public IRC2BurnableToken(String _name, String _symbol, int _decimals, BigInteger _totalSupply) {
+            super(_name, _symbol, _decimals);
+            _mint(Context.getCaller(), _totalSupply);
         }
     }
 
     @BeforeAll
     public static void setup() throws Exception {
         tokenScore = sm.deploy(owner, IRC2BurnableToken.class,
-                name, symbol, BigInteger.valueOf(decimals), initialSupply);
+                name, symbol, decimals, totalSupply);
         owner.addBalance(symbol, totalSupply);
 
         // setup spy object against the tokenScore object
