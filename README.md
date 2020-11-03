@@ -11,7 +11,7 @@ This project provides reusable Java classes to build custom user contracts conve
 You can include this package from JCenter by adding the following dependency in your `build.gradle`.
 
 ```groovy
-implementation 'com.github.sink772:javaee-tokens:0.5.1'
+implementation 'com.github.sink772:javaee-tokens:0.5.2'
 ```
 
 ## License
