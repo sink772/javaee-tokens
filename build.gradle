@@ -1,5 +1,16 @@
+plugins {
+    id 'io.codearte.nexus-staging' version '0.22.0'
+}
+
 subprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
+}
+
+nexusStaging {
+    packageGroup = GROUP
+    stagingProfileId = project.hasProperty('ossrhProfileId') ? "$ossrhProfileId" : ''
+    username = project.hasProperty('ossrhUsername') ? "$ossrhUsername" : ''
+    password = project.hasProperty('ossrhPassword') ? "$ossrhPassword" : ''
 }
