@@ -1,6 +1,6 @@
-[ ![Download](https://api.bintray.com/packages/sink772/maven/javaee-tokens/images/download.svg) ](https://bintray.com/sink772/maven/javaee-tokens/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.sink772/javaee-tokens/badge.svg)](https://search.maven.org/search?q=g:com.github.sink772%20a:javaee-tokens)
 
-# A Java SCORE Library for Standard Tokens
+# A Java SCORE Library for ICON Standard Tokens
 
 This repository contains a Java SCORE library for ICON standard tokens like
 [IRC2](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-2.md) and
@@ -10,7 +10,8 @@ This project provides reusable Java classes to build custom user contracts conve
 
 ## Usage
 
-You can include this package from JCenter by adding the following dependency in your `build.gradle`.
+You can include this package from [Maven Central](https://search.maven.org/search?q=g:com.github.sink772%20a:javaee-tokens)
+by adding the following dependency in your `build.gradle`.
 
 ```groovy
 implementation 'com.github.sink772:javaee-tokens:0.5.4'
