@@ -14,7 +14,7 @@ You can include this package from [Maven Central](https://search.maven.org/searc
 by adding the following dependency in your `build.gradle`.
 
 ```groovy
-implementation 'com.github.sink772:javaee-tokens:0.5.4'
+implementation 'com.github.sink772:javaee-tokens:0.5.5'
 ```
 
 You need to create a entry Java class to inherit the attributes and methods from the basic token classes.
