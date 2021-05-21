@@ -19,6 +19,7 @@ package com.iconloop.score.token.irc2;
 import score.Address;
 import score.Context;
 import score.DictDB;
+import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 import score.annotation.Optional;
@@ -30,7 +31,7 @@ public abstract class IRC2Basic implements IRC2 {
     private final String name;
     private final String symbol;
     private final int decimals;
-    private BigInteger totalSupply = BigInteger.ZERO;
+    private final VarDB<BigInteger> totalSupply = Context.newVarDB("totalSupply", BigInteger.class);
     private final DictDB<Address, BigInteger> balances = Context.newDictDB("balances", BigInteger.class);
 
     public IRC2Basic(String _name, String _symbol, int _decimals) {
@@ -60,7 +61,7 @@ public abstract class IRC2Basic implements IRC2 {
 
     @External(readonly=true)
     public BigInteger totalSupply() {
-        return totalSupply;
+        return totalSupply.getOrDefault(BigInteger.ZERO);
     }
 
     @External(readonly=true)
@@ -97,7 +98,7 @@ public abstract class IRC2Basic implements IRC2 {
         Context.require(!ZERO_ADDRESS.equals(owner));
         Context.require(amount.compareTo(BigInteger.ZERO) >= 0);
 
-        this.totalSupply = this.totalSupply.add(amount);
+        totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).add(amount));
         safeSetBalance(owner, safeGetBalance(owner).add(amount));
         Transfer(ZERO_ADDRESS, owner, amount, "mint".getBytes());
     }
@@ -111,7 +112,7 @@ public abstract class IRC2Basic implements IRC2 {
         Context.require(safeGetBalance(owner).compareTo(amount) >= 0);
 
         safeSetBalance(owner, safeGetBalance(owner).subtract(amount));
-        this.totalSupply = this.totalSupply.subtract(amount);
+        totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).subtract(amount));
         Transfer(owner, ZERO_ADDRESS, amount, "burn".getBytes());
     }
 
