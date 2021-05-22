@@ -101,4 +101,12 @@ public class IRC2MintableTest extends TestBase {
         BigInteger amount = TEN.pow(decimals);
         assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mint", amount));
     }
+    
+    @Test
+    void mintToEve() {
+        Account eve = sm.createAccount();
+        // mint 10 token to Alice but fail, eve is not owner
+        BigInteger amount = TEN.pow(decimals);
+        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mintTo", eve.getAddress(), amount));
+    }
 }
