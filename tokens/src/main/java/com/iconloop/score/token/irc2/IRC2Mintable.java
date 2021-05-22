@@ -19,12 +19,18 @@ package com.iconloop.score.token.irc2;
 import score.Address;
 import score.Context;
 import score.annotation.External;
+import score.VarDB;
 
 import java.math.BigInteger;
 
 public abstract class IRC2Mintable extends IRC2Basic {
+    
+    private final VarDB<Address> minter = Context.newVarDB("minter", Address.class);
+    
     public IRC2Mintable(String _name, String _symbol, int _decimals) {
         super(_name, _symbol, _decimals);
+        // By default, set the minter role to the owner
+        minter.set(Context.getOwner());
     }
 
     /**
@@ -33,8 +39,8 @@ public abstract class IRC2Mintable extends IRC2Basic {
      */
     @External
     public void mint(BigInteger _amount) {
-        // simple access control - only the contract owner can mint new token
-        Context.require(Context.getCaller().equals(Context.getOwner()));
+        // simple access control - only the minter can mint new token
+        Context.require(Context.getCaller().equals(minter.get()));
         _mint(Context.getCaller(), _amount);
     }
 
@@ -44,9 +50,15 @@ public abstract class IRC2Mintable extends IRC2Basic {
      */
     @External
     public void mintTo(Address _account, BigInteger _amount) {
-        // simple access control - only the contract owner can mint new token
-        Context.require(Context.getCaller().equals(Context.getOwner()));
+        // simple access control - only the minter can mint new token
+        Context.require(Context.getCaller().equals(minter.get()));
         _mint(_account, _amount);
     }
 
+    @External
+    public void setMinter(Address _minter) {
+        // simple access control - only the contract owner can mint new token
+        Context.require(Context.getCaller().equals(Context.getOwner()));
+        minter.set(_minter);
+    }
 }
