@@ -33,7 +33,8 @@ public abstract class IRC2Mintable extends IRC2Basic {
      */
     @External
     public void mint(BigInteger _amount) {
-        assert Context.getCaller() == Context.getOwner();
+        // simple access control - only the contract owner can mint new token
+        Context.require(Context.getCaller().equals(Context.getOwner()));
         _mint(Context.getCaller(), _amount);
     }
 
@@ -43,7 +44,8 @@ public abstract class IRC2Mintable extends IRC2Basic {
      */
     @External
     public void mintTo(Address _account, BigInteger _amount) {
-        assert Context.getCaller() == Context.getOwner();
+        // simple access control - only the contract owner can mint new token
+        Context.require(Context.getCaller().equals(Context.getOwner()));
         _mint(_account, _amount);
     }
 
