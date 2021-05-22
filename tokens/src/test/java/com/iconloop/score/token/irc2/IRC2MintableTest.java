@@ -42,6 +42,8 @@ public class IRC2MintableTest extends TestBase {
     private static BigInteger totalSupply = initialSupply.multiply(TEN.pow(decimals));
     private static final ServiceManager sm = getServiceManager();
     private static final Account owner = sm.createAccount();
+    private static final Account alice = sm.createAccount();
+    private static final Account eve = sm.createAccount();
     private static Score tokenScore;
     private static IRC2MintableToken tokenSpy;
 
@@ -82,8 +84,7 @@ public class IRC2MintableTest extends TestBase {
     void mintToAlice() {
         final Address zeroAddress = new Address(new byte[Address.LENGTH]);
         assertEquals(totalSupply, tokenScore.call("totalSupply"));
-        Account alice = sm.createAccount();
-
+        
         // mint 10 token to alice
         BigInteger amount = TEN.pow(decimals);
         tokenScore.invoke(owner, "mintTo", alice.getAddress(), amount);
@@ -93,20 +94,32 @@ public class IRC2MintableTest extends TestBase {
         assertEquals(totalSupply, tokenScore.call("totalSupply"));
         verify(tokenSpy).Transfer(zeroAddress, alice.getAddress(), amount, "mint".getBytes());
     }
-    
+
     @Test
     void mintEve() {
-        Account eve = sm.createAccount();
         // mint 10 token but fail, eve is not owner
         BigInteger amount = TEN.pow(decimals);
         assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mint", amount));
     }
-    
+
     @Test
     void mintToEve() {
-        Account eve = sm.createAccount();
         // mint 10 token to Alice but fail, eve is not owner
         BigInteger amount = TEN.pow(decimals);
         assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mintTo", eve.getAddress(), amount));
+    }
+
+    @Test
+    void setMinter() {
+        // Change minter role to Alice
+        tokenScore.invoke(owner, "setMinter", alice.getAddress());
+
+        // owner shouldn't be able to mint anymore
+        BigInteger amount = TEN.pow(decimals);
+        assertThrows(AssertionError.class, () -> tokenScore.invoke(owner, "mint", amount));
+        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mint", amount));
+
+        // Change the minter role back to owner
+        tokenScore.invoke(owner, "setMinter", owner.getAddress());
     }
 }
