@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ICONLOOP Inc.
+ * Copyright 2021 ICONLOOP Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.iconloop.testsvc.ServiceManager;
 import com.iconloop.testsvc.TestBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import score.Address;
 import score.Context;
 
@@ -30,6 +29,7 @@ import java.math.BigInteger;
 
 import static java.math.BigInteger.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -79,12 +79,12 @@ public class IRC2MintableTest extends TestBase {
         assertEquals(totalSupply, tokenScore.call("totalSupply"));
         verify(tokenSpy).Transfer(zeroAddress, owner.getAddress(), amount, "mint".getBytes());
     }
-    
+
     @Test
     void mintToAlice() {
         final Address zeroAddress = new Address(new byte[Address.LENGTH]);
         assertEquals(totalSupply, tokenScore.call("totalSupply"));
-        
+
         // mint 10 token to alice
         BigInteger amount = TEN.pow(decimals);
         tokenScore.invoke(owner, "mintTo", alice.getAddress(), amount);
@@ -106,7 +106,7 @@ public class IRC2MintableTest extends TestBase {
     void mintToEve() {
         // mint 10 token to Alice but fail, eve is not owner
         BigInteger amount = TEN.pow(decimals);
-        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mintTo", eve.getAddress(), amount));
+        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mintTo", alice.getAddress(), amount));
     }
 
     @Test

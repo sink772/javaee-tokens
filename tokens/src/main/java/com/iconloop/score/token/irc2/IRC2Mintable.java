@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ICONLOOP Inc.
+ * Copyright 2021 ICONLOOP Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package com.iconloop.score.token.irc2;
 
 import score.Address;
 import score.Context;
-import score.annotation.External;
 import score.VarDB;
+import score.annotation.External;
 
 import java.math.BigInteger;
 
 public abstract class IRC2Mintable extends IRC2Basic {
-    
+
     private final VarDB<Address> minter = Context.newVarDB("minter", Address.class);
-    
+
     public IRC2Mintable(String _name, String _symbol, int _decimals) {
         super(_name, _symbol, _decimals);
         // By default, set the minter role to the owner
@@ -34,8 +34,8 @@ public abstract class IRC2Mintable extends IRC2Basic {
     }
 
     /**
-	 * Creates amount number of tokens, and assigns to caller
-	 * Increases the balance of that account and the total supply.
+     * Creates _amount number of tokens, and assigns to caller.
+     * Increases the balance of that account and the total supply.
      */
     @External
     public void mint(BigInteger _amount) {
@@ -45,7 +45,7 @@ public abstract class IRC2Mintable extends IRC2Basic {
     }
 
     /**
-     * Creates amount number of tokens, and assigns to _account
+     * Creates _amount number of tokens, and assigns to _account.
      * Increases the balance of that account and the total supply.
      */
     @External
@@ -57,7 +57,7 @@ public abstract class IRC2Mintable extends IRC2Basic {
 
     @External
     public void setMinter(Address _minter) {
-        // simple access control - only the contract owner can mint new token
+        // simple access control - only the contract owner can set new minter
         Context.require(Context.getCaller().equals(Context.getOwner()));
         minter.set(_minter);
     }
