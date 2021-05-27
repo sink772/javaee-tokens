@@ -45,7 +45,11 @@ public class EnumerableSet<V> {
 
     public Integer indexOf(V value) {
         // returns null if value doesn't exist
-        return indexes.get(value);
+        Integer result = indexes.get(value);
+        if (result != null) {
+            return result - 1;
+        }
+        return null;
     }
 
     public void add(V value) {
