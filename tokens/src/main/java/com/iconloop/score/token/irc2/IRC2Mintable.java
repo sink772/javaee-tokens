@@ -30,7 +30,9 @@ public abstract class IRC2Mintable extends IRC2Basic {
     public IRC2Mintable(String _name, String _symbol, int _decimals) {
         super(_name, _symbol, _decimals);
         // By default, set the minter role to the owner
-        minter.set(Context.getOwner());
+        if (minter.get() == null) {
+            minter.set(Context.getOwner());
+        }
     }
 
     /**
