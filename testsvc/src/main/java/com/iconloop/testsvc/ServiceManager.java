@@ -87,6 +87,15 @@ public class ServiceManager {
     private Score getScoreFromClass(Class<?> caller) {
         var score = classScoreMap.get(caller);
         if (score == null) {
+            for (Class<?> clazz: classScoreMap.keySet()) {
+                var superclass = clazz.getSuperclass();
+                while (!"java.lang.Object".equals(superclass.getName())) {
+                    if (superclass.equals(caller)) {
+                        return classScoreMap.get(clazz);
+                    }
+                    superclass = superclass.getSuperclass();
+                }
+            }
             throw new IllegalStateException(caller.getName() + " not found");
         }
         return score;
@@ -154,7 +163,7 @@ public class ServiceManager {
         public static Block getInstance() {
             if (sInstance == null) {
                 Random rand = new Random();
-                sInstance = new Block(rand.nextInt(1000), System.nanoTime() * 1000);
+                sInstance = new Block(rand.nextInt(1000), System.nanoTime() / 1000);
             }
             return sInstance;
         }
@@ -173,7 +182,7 @@ public class ServiceManager {
 
         public void increase(long delta) {
             height += delta;
-            timestamp = System.nanoTime() * 1000;
+            timestamp = System.nanoTime() / 1000;
         }
     }
 
