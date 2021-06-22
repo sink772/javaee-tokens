@@ -7,3 +7,5 @@ out
 .vscode
 *.class
 *.jar
+.project
+.classpath
