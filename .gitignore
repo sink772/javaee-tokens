@@ -1,11 +1,17 @@
 .gradle
-.settings
 .idea
 build
 out
 
-.vscode
+# Build files
 *.class
 *.jar
+
+# Buildship generated files
 .project
 .classpath
+
+# VsCode generated files
+.settings
+.vscode
+*.code-workspace
