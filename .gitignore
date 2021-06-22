@@ -1,4 +1,9 @@
 .gradle
+.settings
 .idea
 build
 out
+
+.vscode
+*.class
+*.jar
