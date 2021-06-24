@@ -19,8 +19,9 @@ package com.iconloop.score.token.irc31;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
 import score.Address;
+
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,21 +29,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-import java.math.BigInteger;
-
 public class MetadataTest extends MultiTokenTest {
-    
-  @BeforeEach
-  void setup() throws Exception {
-    token_setup();
-    reset(spy);
-}
 
-@Test
-void testTransferSingle() {
-    BigInteger supply = BigInteger.valueOf(100);
+    @BeforeEach
+    void setup() throws Exception {
+        token_setup();
+        reset(spy);
+    }
 
-    BigInteger newId = mint_token(supply);
+    @Test
+    void testTransferSingle() {
+        BigInteger supply = BigInteger.valueOf(100);
+
+        BigInteger newId = mint_token(supply);
     /*
         @EventLog(indexed=3)
         public void TransferSingle(
@@ -52,71 +51,71 @@ void testTransferSingle() {
             Integer _id, 
             BigInteger _value) {}
     */
-    ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
-    ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
-    ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
-    ArgumentCaptor<BigInteger> id = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<BigInteger> value = ArgumentCaptor.forClass(BigInteger.class);
+        ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
+        ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
+        ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
+        ArgumentCaptor<BigInteger> id = ArgumentCaptor.forClass(BigInteger.class);
+        ArgumentCaptor<BigInteger> value = ArgumentCaptor.forClass(BigInteger.class);
 
-    verify(spy).TransferSingle(
-        operator.capture(),
-        from.capture(),
-        to.capture(),
-        id.capture(),
-        value.capture());
-    
-    // Check TransferSingle event
-    assertTrue(operator.getValue().equals(owner.getAddress()));
-    assertTrue(from.getValue().equals(IRC31Basic.ZERO_ADDRESS));
-    assertTrue(to.getValue().equals(owner.getAddress()));
-    assertTrue(id.getValue() == newId);
-    assertTrue(value.getValue().equals(supply));
-  }
+        verify(spy).TransferSingle(
+                operator.capture(),
+                from.capture(),
+                to.capture(),
+                id.capture(),
+                value.capture());
 
-  @Test
-  void testTokenURI() {
-    BigInteger supply = BigInteger.valueOf(100);
-    BigInteger newId = mint_token(supply);
-    String uri = (String) score.call("tokenURI", newId);
-    String expectedUri = "https://craft.network/" + newId;
-    assertTrue(uri.equals(expectedUri));
-  }
+        // Check TransferSingle event
+        assertTrue(operator.getValue().equals(owner.getAddress()));
+        assertTrue(from.getValue().equals(IRC31Basic.ZERO_ADDRESS));
+        assertTrue(to.getValue().equals(owner.getAddress()));
+        assertTrue(id.getValue() == newId);
+        assertTrue(value.getValue().equals(supply));
+    }
 
-  @Test
-  void testSetTokenURI() {
-    BigInteger supply = BigInteger.valueOf(100);
-    BigInteger newId = mint_token(supply);
-    reset(spy);
+    @Test
+    void testTokenURI() {
+        BigInteger supply = BigInteger.valueOf(100);
+        BigInteger newId = mint_token(supply);
+        String uri = (String) score.call("tokenURI", newId);
+        String expectedUri = "https://craft.network/" + newId;
+        assertTrue(uri.equals(expectedUri));
+    }
 
-    String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
-    score.invoke(owner, "setTokenURI", newId, newURI);
+    @Test
+    void testSetTokenURI() {
+        BigInteger supply = BigInteger.valueOf(100);
+        BigInteger newId = mint_token(supply);
+        reset(spy);
 
-    // Test event
+        String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
+        score.invoke(owner, "setTokenURI", newId, newURI);
+
+        // Test event
     /*
         @EventLog(indexed=1)
         public void URI(
             Integer _id, 
             String _value) {}
     */
-    ArgumentCaptor<BigInteger> id = ArgumentCaptor.forClass(BigInteger.class);
-    ArgumentCaptor<String> value = ArgumentCaptor.forClass(String.class);
-    verify(spy).URI(id.capture(), value.capture());
+        ArgumentCaptor<BigInteger> id = ArgumentCaptor.forClass(BigInteger.class);
+        ArgumentCaptor<String> value = ArgumentCaptor.forClass(String.class);
+        verify(spy).URI(id.capture(), value.capture());
 
-    assertEquals(id.getValue(), newId);
-    assertEquals(value.getValue(), newURI);
+        assertEquals(id.getValue(), newId);
+        assertEquals(value.getValue(), newURI);
 
-    // Check updated URI
-    assertEquals(score.call("tokenURI", newId), newURI);
-  }
+        // Check updated URI
+        assertEquals(score.call("tokenURI", newId), newURI);
+    }
 
-  @Test
-  void testSetTokenURIOnlyOwner() {
-    BigInteger supply = BigInteger.valueOf(100);
-    BigInteger newId = mint_token(supply);
-    reset(spy);
+    @Test
+    void testSetTokenURIOnlyOwner() {
+        BigInteger supply = BigInteger.valueOf(100);
+        BigInteger newId = mint_token(supply);
+        reset(spy);
 
-    String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
-    assertThrows(AssertionError.class, () -> 
-        score.invoke(eve, "setTokenURI", newId, newURI));
-  }
+        String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
+        assertThrows(AssertionError.class, () ->
+                score.invoke(eve, "setTokenURI", newId, newURI));
+    }
 }

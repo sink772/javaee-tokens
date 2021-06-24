@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-
 package com.iconloop.score.token.irc31;
-
-import static org.mockito.Mockito.spy;
-
-import java.math.BigInteger;
 
 import com.iconloop.score.test.Account;
 import com.iconloop.score.test.Score;
 import com.iconloop.score.test.ServiceManager;
 import com.iconloop.score.test.TestBase;
 
+import java.math.BigInteger;
+
+import static org.mockito.Mockito.spy;
+
 public class MultiTokenTest extends TestBase {
-    
+
     protected static final ServiceManager sm = getServiceManager();
     protected static final Account owner = sm.createAccount();
     protected static final Account minter = sm.createAccount();
@@ -39,25 +38,25 @@ public class MultiTokenTest extends TestBase {
 
     protected static Score score;
     protected static IRC31MinBurnToken spy;
-    
-    void token_setup () throws Exception {
+
+    void token_setup() throws Exception {
         score = sm.deploy(owner, IRC31MinBurnToken.class);
         spy = (IRC31MinBurnToken) spy(score.getInstance());
         score.setInstance(spy);
     }
-    
-    BigInteger mint_token (BigInteger supply) {
-        return mint_token (supply, owner);
+
+    BigInteger mint_token(BigInteger supply) {
+        return mint_token(supply, owner);
     }
 
-    BigInteger mint_token (BigInteger supply, Account account) {
+    BigInteger mint_token(BigInteger supply, Account account) {
         BigInteger newId = getTokenId();
         String uri = "https://craft.network/" + newId;
         score.invoke(owner, "mint", newId, supply, uri);
         return newId;
     }
-    
-    BigInteger getTokenId () {
+
+    BigInteger getTokenId() {
         return BigInteger.valueOf((int) (Math.random() * 1000000));
     }
 }

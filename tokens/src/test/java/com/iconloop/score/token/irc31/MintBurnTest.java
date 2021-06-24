@@ -14,119 +14,115 @@
  * limitations under the License.
  */
 
-
 package com.iconloop.score.token.irc31;
 
+import com.iconloop.score.test.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.reset;
 
-import java.math.BigInteger;
-
-import com.iconloop.score.test.Account;
-
 public class MintBurnTest extends MultiTokenTest {
-    
-  @BeforeEach
-  void setup() throws Exception {
-    token_setup();
-    reset(spy);
-  }
 
-  void check_balance (Account account, BigInteger id, BigInteger amount)
-  {
-    BigInteger balance = (BigInteger) score.call("balanceOf", account.getAddress(), id);
-    assertEquals(amount, balance);
-  }
+    @BeforeEach
+    void setup() throws Exception {
+        token_setup();
+        reset(spy);
+    }
 
-  @Test
-  void testMint() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
-    BigInteger newId = mint_token(supply);
-    check_balance(owner, newId, supply);
-  }
+    void check_balance(Account account, BigInteger id, BigInteger amount) {
+        BigInteger balance = (BigInteger) score.call("balanceOf", account.getAddress(), id);
+        assertEquals(amount, balance);
+    }
 
-  @Test
-  void testMintAlreadyExists() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
-    BigInteger newId = mint_token(supply);
+    @Test
+    void testMint() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
+        BigInteger newId = mint_token(supply);
+        check_balance(owner, newId, supply);
+    }
 
-    // mint with the existing id
-    assertThrows(AssertionError.class, () -> 
-      score.invoke(owner, "mint", newId, supply, "uri"));
-  }
+    @Test
+    void testMintAlreadyExists() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
+        BigInteger newId = mint_token(supply);
 
-  @Test
-  void testBurnInvalidToken() {
-    assertThrows(AssertionError.class, () -> 
-      score.invoke(owner, "burn", getTokenId(), BigInteger.ONE));
-  }
+        // mint with the existing id
+        assertThrows(AssertionError.class, () ->
+                score.invoke(owner, "mint", newId, supply, "uri"));
+    }
 
-  @Test
-  void testBurn() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-    BigInteger newId = mint_token(supply);
+    @Test
+    void testBurnInvalidToken() {
+        assertThrows(AssertionError.class, () ->
+                score.invoke(owner, "burn", getTokenId(), BigInteger.ONE));
+    }
 
-    // burn with creator
-    BigInteger burn_amount = BigInteger.ONE;
-    score.invoke(owner, "burn", newId, burn_amount);
-  }
+    @Test
+    void testBurn() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
+        BigInteger newId = mint_token(supply);
 
-  @Test
-  void testBurnAllSupply() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-    BigInteger newId = mint_token(supply);
+        // burn with creator
+        BigInteger burn_amount = BigInteger.ONE;
+        score.invoke(owner, "burn", newId, burn_amount);
+    }
 
-    BigInteger burn_amount = supply;
-    score.invoke(owner, "burn", newId, burn_amount);
-  }
+    @Test
+    void testBurnAllSupply() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
+        BigInteger newId = mint_token(supply);
 
-  @Test
-  void testBurnTooMuch() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-    BigInteger newId = mint_token(supply);
+        BigInteger burn_amount = supply;
+        score.invoke(owner, "burn", newId, burn_amount);
+    }
 
-    // burn with creator
-    BigInteger burn_amount = supply.add(BigInteger.ONE);
-    assertThrows(AssertionError.class, () -> 
-      score.invoke(owner, "burn", newId, burn_amount));
-  }
+    @Test
+    void testBurnTooMuch() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
+        BigInteger newId = mint_token(supply);
 
-  @Test
-  void testBurnNotOwner() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-    BigInteger newId = mint_token(supply);
+        // burn with creator
+        BigInteger burn_amount = supply.add(BigInteger.ONE);
+        assertThrows(AssertionError.class, () ->
+                score.invoke(owner, "burn", newId, burn_amount));
+    }
 
-    // burn with eve
-    BigInteger burn_amount = BigInteger.ONE;
-    assertThrows(AssertionError.class, () -> 
-      score.invoke(eve, "burn", newId, burn_amount));
-  }
+    @Test
+    void testBurnNotOwner() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
+        BigInteger newId = mint_token(supply);
 
-  @Test
-  void testBurnAfterTransferOwnership() {
-    BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-    BigInteger newId = mint_token(supply);
+        // burn with eve
+        BigInteger burn_amount = BigInteger.ONE;
+        assertThrows(AssertionError.class, () ->
+                score.invoke(eve, "burn", newId, burn_amount));
+    }
 
-    // transfer ownership 
-    score.invoke(owner, "transferFrom", 
-      owner.getAddress(), 
-      alice.getAddress(), 
-      newId, 
-      supply,
-      "test".getBytes());
+    @Test
+    void testBurnAfterTransferOwnership() {
+        BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
+        BigInteger newId = mint_token(supply);
 
-    check_balance(owner, newId, BigInteger.ZERO);
-    check_balance(alice, newId, supply);
-    
-    // burn with new owner
-    BigInteger burn_amount = BigInteger.ONE;
-    score.invoke(alice, "burn", newId, burn_amount);
-    check_balance(alice, newId, supply.subtract(burn_amount));
-    check_balance(owner, newId, BigInteger.ZERO);
-  }
+        // transfer ownership
+        score.invoke(owner, "transferFrom",
+                owner.getAddress(),
+                alice.getAddress(),
+                newId,
+                supply,
+                "test".getBytes());
 
+        check_balance(owner, newId, BigInteger.ZERO);
+        check_balance(alice, newId, supply);
+
+        // burn with new owner
+        BigInteger burn_amount = BigInteger.ONE;
+        score.invoke(alice, "burn", newId, burn_amount);
+        check_balance(alice, newId, supply.subtract(burn_amount));
+        check_balance(owner, newId, BigInteger.ZERO);
+    }
 }

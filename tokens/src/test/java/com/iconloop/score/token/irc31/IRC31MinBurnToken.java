@@ -16,14 +16,14 @@
 
 package com.iconloop.score.token.irc31;
 
-import java.math.BigInteger;
-
 import score.annotation.External;
 
+import java.math.BigInteger;
+
 public class IRC31MinBurnToken extends IRC31MintBurn {
-    
-    @External(readonly = true)
-    public String name () {
+
+    @External(readonly=true)
+    public String name() {
         return "SampleMultiToken";
     }
 
@@ -36,9 +36,9 @@ public class IRC31MinBurnToken extends IRC31MintBurn {
     public void burn(BigInteger _id, BigInteger _amount) {
         super._burn(_id, _amount);
     }
-    
+
     @External
-    public void setTokenURI (BigInteger _id, String _uri) {
+    public void setTokenURI(BigInteger _id, String _uri) {
         super._setTokenURI(_id, _uri);
     }
 }

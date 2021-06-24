@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2021 ICONation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,11 @@
 
 package com.iconloop.score.token.irc31;
 
-import java.math.BigInteger;
-
 import score.Address;
 import score.Context;
 import score.DictDB;
+
+import java.math.BigInteger;
 
 public class IRC31MintBurn extends IRC31Basic {
 
@@ -33,21 +33,22 @@ public class IRC31MintBurn extends IRC31Basic {
     // ================================================
     // External methods
     // ================================================
+
     /**
-     *  Creates a new token type and assigns _supply to creator
-     * 
-     *  @param _owner   Owner address of the tokens
-     *  @param _id      ID of the token
-     *  @param _supply  The initial token supply
-     *  @param _uri     The token URI
+     * Creates a new token type and assigns _supply to creator
+     *
+     * @param _owner  Owner address of the tokens
+     * @param _id     ID of the token
+     * @param _supply The initial token supply
+     * @param _uri    The token URI
      */
-    protected void _mint (Address _owner, BigInteger _id, BigInteger _supply, String _uri) {
-        Context.require (creators.get(_id) == null,
-            "Token is already minted");
-        Context.require (_supply.compareTo(BigInteger.ZERO) > 0,
-            "Supply should be positive");
-        Context.require (_uri.length() > 0,
-            "Uri should be set");
+    protected void _mint(Address _owner, BigInteger _id, BigInteger _supply, String _uri) {
+        Context.require(creators.get(_id) == null,
+                "Token is already minted");
+        Context.require(_supply.compareTo(BigInteger.ZERO) > 0,
+                "Supply should be positive");
+        Context.require(_uri.length() > 0,
+                "Uri should be set");
 
         creators.set(_id, _owner);
         balances.at(_id).set(_owner, _supply);
@@ -60,34 +61,34 @@ public class IRC31MintBurn extends IRC31Basic {
     }
 
     /**
-     *  Creates a new token type and assigns _supply to caller
-     * 
-     *  @param _id      ID of the token
-     *  @param _supply  The initial token supply
-     *  @param _uri     The token URI
+     * Creates a new token type and assigns _supply to caller
+     *
+     * @param _id     ID of the token
+     * @param _supply The initial token supply
+     * @param _uri    The token URI
      */
-    protected void _mint (BigInteger _id, BigInteger _supply, String _uri) {
+    protected void _mint(BigInteger _id, BigInteger _supply, String _uri) {
         _mint(Context.getCaller(), _id, _supply, _uri);
     }
 
     /**
-     *  Destroys tokens for a given amount
-     * 
-     *  @param _id      ID of the token
-     *  @param _amount  The amount of tokens to burn
+     * Destroys tokens for a given amount
+     *
+     * @param _id     ID of the token
+     * @param _amount The amount of tokens to burn
      */
-    protected void _burn (BigInteger _id, BigInteger _amount) {
-        Context.require (creators.get(_id) != null, 
-            "Invalid token id");
-        Context.require (_amount.compareTo(BigInteger.ZERO) > 0, 
-            "Amount should be positive");
+    protected void _burn(BigInteger _id, BigInteger _amount) {
+        Context.require(creators.get(_id) != null,
+                "Invalid token id");
+        Context.require(_amount.compareTo(BigInteger.ZERO) > 0,
+                "Amount should be positive");
 
         final Address caller = Context.getCaller();
-        
+
         BigInteger balance = balanceOf(caller, _id);
 
-        Context.require(BigInteger.ZERO.compareTo(_amount) <= 0 && _amount.compareTo(balance) <= 0, 
-            "Not an owner or invalid amount");
+        Context.require(BigInteger.ZERO.compareTo(_amount) <= 0 && _amount.compareTo(balance) <= 0,
+                "Not an owner or invalid amount");
 
         balances.at(_id).set(caller, balance.subtract(_amount));
 
@@ -96,15 +97,15 @@ public class IRC31MintBurn extends IRC31Basic {
     }
 
     /**
-     *  Updates the given token URI
-     * 
-     *  @param _id      ID of the token
-     *  @param _uri     The token URI
+     * Updates the given token URI
+     *
+     * @param _id  ID of the token
+     * @param _uri The token URI
      */
-    protected void _setTokenURI (BigInteger _id, String _uri) {
-        Context.require (creators.get(_id).equals(Context.getCaller()), 
-            "Not token creator");
-        
+    protected void _setTokenURI(BigInteger _id, String _uri) {
+        Context.require(creators.get(_id).equals(Context.getCaller()),
+                "Not token creator");
+
         super._setTokenURI(_id, _uri);
     }
 }
