@@ -207,19 +207,20 @@ public class TransferTest extends MultiTokenTest {
         byte[] data1 = valuesCaptor.getAllValues().get(1);
 
         ObjectReader reader = Context.newByteArrayObjectReader("RLPn", data0);
-        int sizeIds = reader.readInt();
-        BigInteger[] idsRlp = new BigInteger[sizeIds];
-
-        for (int i = 0; i < sizeIds; i++) {
+        BigInteger[] idsRlp = new BigInteger[ids.length];
+        reader.beginList();
+        for (int i = 0; i < idsRlp.length; i++) {
             idsRlp[i] = reader.readBigInteger();
         }
+        reader.end();
 
         ObjectReader reader2 = Context.newByteArrayObjectReader("RLPn", data1);
-        int sizeValues = reader2.readInt();
-        BigInteger[] valuesRlp = new BigInteger[sizeValues];
-        for (int i = 0; i < sizeValues; i++) {
+        BigInteger[] valuesRlp = new BigInteger[ids.length];
+        reader2.beginList();
+        for (int i = 0; i < valuesRlp.length; i++) {
             valuesRlp[i] = reader2.readBigInteger();
         }
+        reader2.end();
 
         for (int i = 0; i < ids.length; i++) {
             assertEquals(idsRlp[i], ids[i]);
