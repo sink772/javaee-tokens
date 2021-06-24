@@ -27,7 +27,7 @@ import score.annotation.Optional;
 
 import java.math.BigInteger;
 
-public class IRC31Basic {
+public abstract class IRC31Basic implements IRC31 {
 
     // ================================================
     // Consts

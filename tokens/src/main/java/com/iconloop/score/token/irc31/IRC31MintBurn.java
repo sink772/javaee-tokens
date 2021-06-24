@@ -22,7 +22,7 @@ import score.DictDB;
 
 import java.math.BigInteger;
 
-public class IRC31MintBurn extends IRC31Basic {
+public abstract class IRC31MintBurn extends IRC31Basic {
 
     // ================================================
     // SCORE DB 
