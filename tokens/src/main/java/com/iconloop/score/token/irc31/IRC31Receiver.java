@@ -17,11 +17,6 @@
 package com.iconloop.score.token.irc31;
 
 import score.Address;
-import score.Context;
-import score.DictDB;
-import score.annotation.EventLog;
-import score.annotation.External;
-import score.annotation.Optional;
 
 import java.math.BigInteger;
 
@@ -29,35 +24,7 @@ import java.math.BigInteger;
  * Smart contracts that want to receive tokens from IRC31-compatible token contracts
  * must implement all of the following receiver methods to accept transfers.
  */
-public class IRC31Receiver {
-
-    // ================================================
-    // SCORE DB 
-    // ================================================
-    // allowlist of token contracts
-    final private DictDB<Address, Boolean> originators = Context.newDictDB("originators", Boolean.class);
-
-    // ================================================
-    // Event Logs
-    // ================================================
-    @EventLog(indexed=3)
-    public void IRC31Received(Address _origin, Address _operator, Address _from,
-                              BigInteger _id, BigInteger _value, byte[] _data) {
-    }
-
-    // ================================================
-    // External methods
-    // ================================================
-
-    @External
-    public void setOriginator(Address _origin, boolean _approved) {
-        Context.require(Context.getOwner().equals(Context.getCaller()),
-                "Not contract owner");
-        Context.require(_origin.isContract(),
-                "Not contract address");
-        originators.set(_origin, _approved);
-    }
-
+public interface IRC31Receiver {
     /**
      * A method for handling a single token type transfer, which is called from the multi token contract.
      * It works by analogy with the fallback method of the normal transactions and returns nothing.
@@ -70,13 +37,7 @@ public class IRC31Receiver {
      * @param _value    The amount of tokens being transferred
      * @param _data     Additional data with no specified format
      */
-    @External
-    public void onIRC31Received(Address _operator, Address _from, BigInteger _id, BigInteger _value, @Optional byte[] _data) {
-        final Address caller = Context.getCaller();
-        Context.require(originators.get(caller) != null,
-                "Unrecognized token contract");
-        this.IRC31Received(caller, _operator, _from, _id, _value, _data);
-    }
+    void onIRC31Received(Address _operator, Address _from, BigInteger _id, BigInteger _value, byte[] _data);
 
     /**
      * A method for handling multiple token type transfers, which is called from the multi token contract.
@@ -90,16 +51,5 @@ public class IRC31Receiver {
      * @param _values   The list of amounts of each token being transferred (order and length must match `_ids` list)
      * @param _data     Additional data with no specified format
      */
-    @External
-    public void onIRC31BatchReceived(Address _operator, Address _from, BigInteger[] _ids, BigInteger[] _values, @Optional byte[] _data) {
-        final Address caller = Context.getCaller();
-        Context.require(originators.get(caller) != null,
-                "Unrecognized token contract");
-
-        for (int i = 0; i < _ids.length; i++) {
-            BigInteger _id = _ids[i];
-            BigInteger _value = _values[i];
-            this.IRC31Received(caller, _operator, _from, _id, _value, _data);
-        }
-    }
+    void onIRC31BatchReceived(Address _operator, Address _from, BigInteger[] _ids, BigInteger[] _values, byte[] _data);
 }

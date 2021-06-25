@@ -33,36 +33,32 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-public class ReceiverTest extends TestBase {
+public class IRC31ReceiverTest extends TestBase {
 
     protected static final ServiceManager sm = getServiceManager();
     protected static final Account owner = sm.createAccount();
-    protected static final Account minter = sm.createAccount();
-    protected static final Account burner = sm.createAccount();
     protected static final Account alice = sm.createAccount();
     protected static final Account bob = sm.createAccount();
-    protected static final Account eve = sm.createAccount();
-    protected static final BigInteger EXA = BigInteger.TEN.pow(18);
 
     protected static Score scoreRcv;
-    protected static IRC31Receiver spyRcv;
+    protected static IRC31SampleReceiver spyRcv;
 
     protected static Score scoreToken;
     protected static IRC31MinBurnToken spyToken;
 
-    void receiver_setup() throws Exception {
-        scoreRcv = sm.deploy(owner, IRC31Receiver.class);
-        spyRcv = (IRC31Receiver) spy(scoreRcv.getInstance());
+    void receiverSetup() throws Exception {
+        scoreRcv = sm.deploy(owner, IRC31SampleReceiver.class);
+        spyRcv = (IRC31SampleReceiver) spy(scoreRcv.getInstance());
         scoreRcv.setInstance(spyRcv);
     }
 
-    void token_setup() throws Exception {
+    void tokenSetup() throws Exception {
         scoreToken = sm.deploy(owner, IRC31MinBurnToken.class);
         spyToken = (IRC31MinBurnToken) spy(scoreToken.getInstance());
         scoreToken.setInstance(spyToken);
     }
 
-    BigInteger mint_token(BigInteger supply) {
+    BigInteger mintToken(BigInteger supply) {
         BigInteger newId = getTokenId();
         String uri = "https://craft.network/" + newId;
         scoreToken.invoke(owner, "mint", newId, supply, uri);
@@ -75,10 +71,8 @@ public class ReceiverTest extends TestBase {
 
     @BeforeEach
     void setup() throws Exception {
-        receiver_setup();
-        token_setup();
-        reset(spyRcv);
-        reset(spyToken);
+        receiverSetup();
+        tokenSetup();
     }
 
     @Test
@@ -89,7 +83,7 @@ public class ReceiverTest extends TestBase {
     @Test
     void testSetOriginatorNotOwner() {
         assertThrows(AssertionError.class, () ->
-                scoreRcv.invoke(eve, "setOriginator", scoreToken.getAddress(), true));
+                scoreRcv.invoke(bob, "setOriginator", scoreToken.getAddress(), true));
     }
 
     @Test
@@ -99,33 +93,27 @@ public class ReceiverTest extends TestBase {
     }
 
     @Test
-    void testOnReceived() throws Exception {
-
+    void testOnReceived() {
         BigInteger supply = BigInteger.valueOf(100);
         BigInteger newSupply = supply.divide(BigInteger.TWO);
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
         reset(spyToken);
 
         byte[] data = "Hello".getBytes();
-
         scoreRcv.invoke(owner, "setOriginator", scoreToken.getAddress(), true);
-
         scoreToken.invoke(owner, "transferFrom",
-                owner.getAddress(),
-                scoreRcv.getAddress(),
-                newId,
-                newSupply,
-                data);
-        
-      /*
-        @EventLog(indexed=3)
-        public void TransferSingle(
-            Address _operator, 
-            Address _from, 
-            Address _to, 
-            Integer _id, 
-            BigInteger _value) {}
-      */
+                owner.getAddress(), scoreRcv.getAddress(),
+                newId, newSupply, data);
+
+        /*
+          @EventLog(indexed=3)
+          public void TransferSingle(
+              Address _operator,
+              Address _from,
+              Address _to,
+              Integer _id,
+              BigInteger _value) {}
+        */
         ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
@@ -146,16 +134,16 @@ public class ReceiverTest extends TestBase {
         assertEquals(id.getValue(), newId);
         assertEquals(value.getValue(), newSupply);
 
-      /*
-        @EventLog(indexed=3)
-        public void IRC31Received(
-            Address _origin,  
-            Address _operator, 
-            Address _from, 
-            Integer _id, 
-            BigInteger _value, 
-            byte[] _data) {}
-      */
+        /*
+          @EventLog(indexed=3)
+          public void IRC31Received(
+              Address _origin,
+              Address _operator,
+              Address _from,
+              Integer _id,
+              BigInteger _value,
+              byte[] _data) {}
+        */
         ArgumentCaptor<Address> origin = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<byte[]> dataCaptor = ArgumentCaptor.forClass(byte[].class);
 
@@ -179,16 +167,13 @@ public class ReceiverTest extends TestBase {
     @Test
     void testOnBatchReceived() {
         BigInteger supply = BigInteger.valueOf(100);
-
         BigInteger[] ids = new BigInteger[3];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = mint_token(supply);
+            ids[i] = mintToken(supply);
         }
-
         BigInteger[] values = {BigInteger.valueOf(50), BigInteger.valueOf(60), BigInteger.valueOf(70)};
 
         scoreRcv.invoke(owner, "setOriginator", scoreToken.getAddress(), true);
-
         scoreToken.invoke(owner, "transferFromBatch",
                 owner.getAddress(), scoreRcv.getAddress(), ids, values, "test".getBytes());
     }
