@@ -26,15 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.reset;
 
-public class MintBurnTest extends MultiTokenTest {
+public class IRC31MintBurnTest extends MultiTokenTest {
 
     @BeforeEach
     void setup() throws Exception {
-        token_setup();
+        tokenSetup();
         reset(spy);
     }
 
-    void check_balance(Account account, BigInteger id, BigInteger amount) {
+    void checkBalance(Account account, BigInteger id, BigInteger amount) {
         BigInteger balance = (BigInteger) score.call("balanceOf", account.getAddress(), id);
         assertEquals(amount, balance);
     }
@@ -42,14 +42,14 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testMint() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
-        BigInteger newId = mint_token(supply);
-        check_balance(owner, newId, supply);
+        BigInteger newId = mintToken(supply);
+        checkBalance(owner, newId, supply);
     }
 
     @Test
     void testMintAlreadyExists() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 1));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         // mint with the existing id
         assertThrows(AssertionError.class, () ->
@@ -65,7 +65,7 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testBurn() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         // burn with creator
         BigInteger burn_amount = BigInteger.ONE;
@@ -75,7 +75,7 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testBurnAllSupply() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         BigInteger burn_amount = supply;
         score.invoke(owner, "burn", newId, burn_amount);
@@ -84,7 +84,7 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testBurnTooMuch() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         // burn with creator
         BigInteger burn_amount = supply.add(BigInteger.ONE);
@@ -95,7 +95,7 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testBurnNotOwner() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         // burn with eve
         BigInteger burn_amount = BigInteger.ONE;
@@ -106,7 +106,7 @@ public class MintBurnTest extends MultiTokenTest {
     @Test
     void testBurnAfterTransferOwnership() {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
 
         // transfer ownership
         score.invoke(owner, "transferFrom",
@@ -116,13 +116,13 @@ public class MintBurnTest extends MultiTokenTest {
                 supply,
                 "test".getBytes());
 
-        check_balance(owner, newId, BigInteger.ZERO);
-        check_balance(alice, newId, supply);
+        checkBalance(owner, newId, BigInteger.ZERO);
+        checkBalance(alice, newId, supply);
 
         // burn with new owner
         BigInteger burn_amount = BigInteger.ONE;
         score.invoke(alice, "burn", newId, burn_amount);
-        check_balance(alice, newId, supply.subtract(burn_amount));
-        check_balance(owner, newId, BigInteger.ZERO);
+        checkBalance(alice, newId, supply.subtract(burn_amount));
+        checkBalance(owner, newId, BigInteger.ZERO);
     }
 }

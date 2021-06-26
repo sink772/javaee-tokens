@@ -31,18 +31,18 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class TransferTest extends MultiTokenTest {
+public class IRC31TransferTest extends MultiTokenTest {
 
     @BeforeEach
     void setup() throws Exception {
-        token_setup();
+        tokenSetup();
         reset(spy);
     }
 
     @Test
     void testTransferFromZeroAddress() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply, alice);
+        BigInteger newId = mintToken(supply, alice);
 
         // transfer ownership
         assertThrows(AssertionError.class, () ->
@@ -57,7 +57,7 @@ public class TransferTest extends MultiTokenTest {
     @Test
     void testTransferFromTooMuch() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply, alice);
+        BigInteger newId = mintToken(supply, alice);
 
         // transfer ownership
         assertThrows(AssertionError.class, () ->
@@ -72,7 +72,7 @@ public class TransferTest extends MultiTokenTest {
     @Test
     void testTransferFrom() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply, alice);
+        BigInteger newId = mintToken(supply, alice);
         reset(spy);
 
         // transfer ownership
@@ -83,15 +83,15 @@ public class TransferTest extends MultiTokenTest {
                 supply,
                 "test".getBytes());
 
-    /*
-        @EventLog(indexed=3)
-        public void TransferSingle(
-            Address _operator, 
-            Address _from, 
-            Address _to, 
-            Integer _id, 
-            BigInteger _value) {}
-    */
+        /*
+            @EventLog(indexed=3)
+            public void TransferSingle(
+                Address _operator,
+                Address _from,
+                Address _to,
+                Integer _id,
+                BigInteger _value) {}
+        */
         ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
@@ -148,7 +148,7 @@ public class TransferTest extends MultiTokenTest {
 
         BigInteger[] ids = new BigInteger[3];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = mint_token(supply);
+            ids[i] = mintToken(supply);
         }
 
         BigInteger[] values = {BigInteger.valueOf(50), BigInteger.valueOf(60), BigInteger.valueOf(70)};
@@ -174,15 +174,15 @@ public class TransferTest extends MultiTokenTest {
         score.invoke(owner, "transferFromBatch", alice.getAddress(), bob.getAddress(), ids, values2, "test".getBytes());
 
         // check TransferBatch events
-    /*
-      @EventLog(indexed=3)
-      public void TransferBatch(
-        Address _operator, 
-        Address _from, 
-        Address _to, 
-        byte[] _ids, 
-        byte[] _values)
-    */
+        /*
+          @EventLog(indexed=3)
+          public void TransferBatch(
+            Address _operator,
+            Address _from,
+            Address _to,
+            byte[] _ids,
+            byte[] _values)
+        */
         ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
@@ -245,7 +245,7 @@ public class TransferTest extends MultiTokenTest {
 
         BigInteger[] ids = new BigInteger[3];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = mint_token(supply);
+            ids[i] = mintToken(supply);
         }
 
         BigInteger[] values = {BigInteger.valueOf(50), BigInteger.valueOf(60), BigInteger.valueOf(70)};
@@ -260,7 +260,7 @@ public class TransferTest extends MultiTokenTest {
 
         BigInteger[] ids = new BigInteger[3];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = mint_token(supply);
+            ids[i] = mintToken(supply);
         }
 
         BigInteger[] values = {BigInteger.valueOf(50)};
@@ -275,7 +275,7 @@ public class TransferTest extends MultiTokenTest {
 
         BigInteger[] ids = new BigInteger[3];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = mint_token(supply);
+            ids[i] = mintToken(supply);
         }
 
         BigInteger[] values = {BigInteger.valueOf(50), supply.add(BigInteger.ONE), BigInteger.valueOf(70)};

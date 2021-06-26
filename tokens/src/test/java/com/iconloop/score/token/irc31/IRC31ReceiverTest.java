@@ -44,7 +44,7 @@ public class IRC31ReceiverTest extends TestBase {
     protected static IRC31SampleReceiver spyRcv;
 
     protected static Score scoreToken;
-    protected static IRC31MinBurnToken spyToken;
+    protected static IRC31SampleToken spyToken;
 
     void receiverSetup() throws Exception {
         scoreRcv = sm.deploy(owner, IRC31SampleReceiver.class);
@@ -53,8 +53,8 @@ public class IRC31ReceiverTest extends TestBase {
     }
 
     void tokenSetup() throws Exception {
-        scoreToken = sm.deploy(owner, IRC31MinBurnToken.class);
-        spyToken = (IRC31MinBurnToken) spy(scoreToken.getInstance());
+        scoreToken = sm.deploy(owner, IRC31SampleToken.class);
+        spyToken = (IRC31SampleToken) spy(scoreToken.getInstance());
         scoreToken.setInstance(spyToken);
     }
 

@@ -19,6 +19,7 @@ package com.iconloop.score.token.irc31;
 import score.Address;
 import score.Context;
 import score.DictDB;
+import score.annotation.External;
 
 import java.math.BigInteger;
 
@@ -28,7 +29,7 @@ public abstract class IRC31MintBurn extends IRC31Basic {
     // SCORE DB 
     // ================================================
     // id ==> creator
-    protected final DictDB<BigInteger, Address> creators = Context.newDictDB("creators", Address.class);
+    private final DictDB<BigInteger, Address> creators = Context.newDictDB("creators", Address.class);
 
     // ================================================
     // External methods
@@ -37,38 +38,22 @@ public abstract class IRC31MintBurn extends IRC31Basic {
     /**
      * Creates a new token type and assigns _supply to creator
      *
-     * @param _owner  Owner address of the tokens
      * @param _id     ID of the token
      * @param _supply The initial token supply
      * @param _uri    The token URI
      */
-    protected void _mint(Address _owner, BigInteger _id, BigInteger _supply, String _uri) {
-        Context.require(creators.get(_id) == null,
-                "Token is already minted");
-        Context.require(_supply.compareTo(BigInteger.ZERO) > 0,
-                "Supply should be positive");
-        Context.require(_uri.length() > 0,
-                "Uri should be set");
+    @External
+    public void mint(BigInteger _id, BigInteger _supply, String _uri) {
+        Context.require(creators.get(_id) == null, "Token is already minted");
+        Context.require(_supply.compareTo(BigInteger.ZERO) > 0, "Supply should be positive");
 
-        creators.set(_id, _owner);
-        balances.at(_id).set(_owner, _supply);
+        final Address caller = Context.getCaller();
+        creators.set(_id, caller);
 
-        // emit transfer event for Mint semantic
-        this.TransferSingle(_owner, ZERO_ADDRESS, _owner, _id, _supply);
-
-        // set token URI and emit event
-        this._setTokenURI(_id, _uri);
-    }
-
-    /**
-     * Creates a new token type and assigns _supply to caller
-     *
-     * @param _id     ID of the token
-     * @param _supply The initial token supply
-     * @param _uri    The token URI
-     */
-    protected void _mint(BigInteger _id, BigInteger _supply, String _uri) {
-        _mint(Context.getCaller(), _id, _supply, _uri);
+        // mint tokens
+        super._mint(caller, _id, _supply);
+        // set token URI
+        super._setTokenURI(_id, _uri);
     }
 
     /**
@@ -77,23 +62,13 @@ public abstract class IRC31MintBurn extends IRC31Basic {
      * @param _id     ID of the token
      * @param _amount The amount of tokens to burn
      */
-    protected void _burn(BigInteger _id, BigInteger _amount) {
-        Context.require(creators.get(_id) != null,
-                "Invalid token id");
-        Context.require(_amount.compareTo(BigInteger.ZERO) > 0,
-                "Amount should be positive");
+    @External
+    public void burn(BigInteger _id, BigInteger _amount) {
+        Context.require(creators.get(_id) != null, "Invalid token id");
+        Context.require(_amount.compareTo(BigInteger.ZERO) > 0, "Amount should be positive");
 
-        final Address caller = Context.getCaller();
-
-        BigInteger balance = balanceOf(caller, _id);
-
-        Context.require(BigInteger.ZERO.compareTo(_amount) <= 0 && _amount.compareTo(balance) <= 0,
-                "Not an owner or invalid amount");
-
-        balances.at(_id).set(caller, balance.subtract(_amount));
-
-        // emit transfer event for Burn semantic
-        this.TransferSingle(caller, caller, ZERO_ADDRESS, _id, _amount);
+        // burn tokens
+        super._burn(Context.getCaller(), _id, _amount);
     }
 
     /**
@@ -102,9 +77,9 @@ public abstract class IRC31MintBurn extends IRC31Basic {
      * @param _id  ID of the token
      * @param _uri The token URI
      */
-    protected void _setTokenURI(BigInteger _id, String _uri) {
-        Context.require(creators.get(_id).equals(Context.getCaller()),
-                "Not token creator");
+    @External
+    public void setTokenURI(BigInteger _id, String _uri) {
+        Context.require(Context.getCaller().equals(creators.get(_id)), "Not token creator");
 
         super._setTokenURI(_id, _uri);
     }

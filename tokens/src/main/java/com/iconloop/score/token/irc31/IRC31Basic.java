@@ -35,45 +35,14 @@ public abstract class IRC31Basic implements IRC31 {
     public static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
 
     // ================================================
-    // SCORE DB 
+    // SCORE DB
     // ================================================
     // id => (owner => balance)
-    protected final BranchDB<BigInteger, DictDB<Address, BigInteger>> balances = Context.newBranchDB("balances", BigInteger.class);
+    private final BranchDB<BigInteger, DictDB<Address, BigInteger>> balances = Context.newBranchDB("balances", BigInteger.class);
     // owner => (operator => approved)
-    protected final BranchDB<Address, DictDB<Address, Boolean>> operatorApproval = Context.newBranchDB("approval", Boolean.class);
+    private final BranchDB<Address, DictDB<Address, Boolean>> operatorApproval = Context.newBranchDB("approval", Boolean.class);
     // id => token URI
-    protected final DictDB<BigInteger, String> tokenURIs = Context.newDictDB("token_uri", String.class);
-
-    // ================================================
-    // Internal methods
-    // ================================================
-
-    /**
-     * Convert a list of BigInteger to a RLP-encoded byte array
-     *
-     * @param ids A list of BigInteger
-     * @return a RLP encoded byte array
-     */
-    protected static byte[] rlpEncode(BigInteger[] ids) {
-        Context.require(ids != null);
-
-        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
-
-        writer.beginList(ids.length);
-        for (BigInteger v : ids) {
-            writer.write(v);
-        }
-        writer.end();
-
-        return writer.toByteArray();
-    }
-
-    protected void _setTokenURI(BigInteger _id, String _uri) {
-        Context.require(_uri.length() > 0,
-                "Uri should be set");
-        tokenURIs.set(_id, _uri);
-        this.URI(_id, _uri);
-    }
+    private final DictDB<BigInteger, String> tokenURIs = Context.newDictDB("token_uri", String.class);
 
     // ================================================
     // External methods
@@ -194,4 +163,89 @@ public abstract class IRC31Basic implements IRC31 {
 
     @EventLog(indexed=1)
     public void URI(BigInteger _id, String _value) {}
+
+    // ================================================
+    // Internal methods
+    // ================================================
+
+    /**
+     * Convert a list of BigInteger to a RLP-encoded byte array
+     *
+     * @param ids A list of BigInteger
+     * @return a RLP encoded byte array
+     */
+    protected static byte[] rlpEncode(BigInteger[] ids) {
+        Context.require(ids != null);
+
+        ByteArrayObjectWriter writer = Context.newByteArrayObjectWriter("RLPn");
+
+        writer.beginList(ids.length);
+        for (BigInteger v : ids) {
+            writer.write(v);
+        }
+        writer.end();
+
+        return writer.toByteArray();
+    }
+
+    protected void _setTokenURI(BigInteger _id, String _uri) {
+        Context.require(_uri.length() > 0, "Uri should be set");
+        tokenURIs.set(_id, _uri);
+        this.URI(_id, _uri);
+    }
+
+    private void _mintInternal(Address owner, BigInteger id, BigInteger amount) {
+        Context.require(amount.compareTo(BigInteger.ZERO) > 0, "Invalid amount");
+
+        BigInteger balance = balanceOf(owner, id);
+        balances.at(id).set(owner, balance.add(amount));
+    }
+
+    protected void _mint(Address owner, BigInteger id, BigInteger amount) {
+        _mintInternal(owner, id, amount);
+
+        // emit transfer event for Mint semantic
+        TransferSingle(owner, ZERO_ADDRESS, owner, id, amount);
+    }
+
+    protected void _mintBatch(Address owner, BigInteger[] ids, BigInteger[] amounts) {
+        Context.require(ids.length == amounts.length, "id/amount pairs mismatch");
+
+        for (int i = 0; i < ids.length; i++) {
+            BigInteger id = ids[i];
+            BigInteger amount = amounts[i];
+            _mintInternal(owner, id, amount);
+        }
+
+        // emit transfer event for Mint semantic
+        TransferBatch(owner, ZERO_ADDRESS, owner, rlpEncode(ids), rlpEncode(amounts));
+    }
+
+    private void _burnInternal(Address owner, BigInteger id, BigInteger amount) {
+        Context.require(amount.compareTo(BigInteger.ZERO) > 0, "Invalid amount");
+
+        BigInteger balance = balanceOf(owner, id);
+        Context.require(balance.compareTo(amount) >= 0, "Insufficient funds");
+        balances.at(id).set(owner, balance.subtract(amount));
+    }
+
+    protected void _burn(Address owner, BigInteger id, BigInteger amount) {
+        _burnInternal(owner, id, amount);
+
+        // emit transfer event for Burn semantic
+        TransferSingle(owner, owner, ZERO_ADDRESS, id, amount);
+    }
+
+    protected void _burnBatch(Address owner, BigInteger[] ids, BigInteger[] amounts) {
+        Context.require(ids.length == amounts.length, "id/amount pairs mismatch");
+
+        for (int i = 0; i < ids.length; i++) {
+            BigInteger id = ids[i];
+            BigInteger amount = amounts[i];
+            _burnInternal(owner, id, amount);
+        }
+
+        // emit transfer event for Burn semantic
+        TransferBatch(owner, owner, ZERO_ADDRESS, rlpEncode(ids), rlpEncode(amounts));
+    }
 }

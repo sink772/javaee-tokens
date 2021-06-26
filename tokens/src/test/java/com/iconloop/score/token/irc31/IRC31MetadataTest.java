@@ -25,32 +25,31 @@ import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
-public class MetadataTest extends MultiTokenTest {
+public class IRC31MetadataTest extends MultiTokenTest {
 
     @BeforeEach
     void setup() throws Exception {
-        token_setup();
+        tokenSetup();
         reset(spy);
     }
 
     @Test
     void testTransferSingle() {
         BigInteger supply = BigInteger.valueOf(100);
+        BigInteger newId = mintToken(supply);
 
-        BigInteger newId = mint_token(supply);
-    /*
-        @EventLog(indexed=3)
-        public void TransferSingle(
-            Address _operator, 
-            Address _from, 
-            Address _to, 
-            Integer _id, 
-            BigInteger _value) {}
-    */
+        /*
+            @EventLog(indexed=3)
+            public void TransferSingle(
+                Address _operator,
+                Address _from,
+                Address _to,
+                Integer _id,
+                BigInteger _value) {}
+        */
         ArgumentCaptor<Address> operator = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> from = ArgumentCaptor.forClass(Address.class);
         ArgumentCaptor<Address> to = ArgumentCaptor.forClass(Address.class);
@@ -65,38 +64,38 @@ public class MetadataTest extends MultiTokenTest {
                 value.capture());
 
         // Check TransferSingle event
-        assertTrue(operator.getValue().equals(owner.getAddress()));
-        assertTrue(from.getValue().equals(IRC31Basic.ZERO_ADDRESS));
-        assertTrue(to.getValue().equals(owner.getAddress()));
-        assertTrue(id.getValue() == newId);
-        assertTrue(value.getValue().equals(supply));
+        assertEquals(operator.getValue(), owner.getAddress());
+        assertEquals(from.getValue(), IRC31Basic.ZERO_ADDRESS);
+        assertEquals(to.getValue(), owner.getAddress());
+        assertEquals(id.getValue(), newId);
+        assertEquals(value.getValue(), supply);
     }
 
     @Test
     void testTokenURI() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
         String uri = (String) score.call("tokenURI", newId);
         String expectedUri = "https://craft.network/" + newId;
-        assertTrue(uri.equals(expectedUri));
+        assertEquals(uri, expectedUri);
     }
 
     @Test
     void testSetTokenURI() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
         reset(spy);
 
         String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
         score.invoke(owner, "setTokenURI", newId, newURI);
 
         // Test event
-    /*
-        @EventLog(indexed=1)
-        public void URI(
-            Integer _id, 
-            String _value) {}
-    */
+        /*
+            @EventLog(indexed=1)
+            public void URI(
+                Integer _id,
+                String _value) {}
+        */
         ArgumentCaptor<BigInteger> id = ArgumentCaptor.forClass(BigInteger.class);
         ArgumentCaptor<String> value = ArgumentCaptor.forClass(String.class);
         verify(spy).URI(id.capture(), value.capture());
@@ -111,7 +110,7 @@ public class MetadataTest extends MultiTokenTest {
     @Test
     void testSetTokenURIOnlyOwner() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mint_token(supply);
+        BigInteger newId = mintToken(supply);
         reset(spy);
 
         String newURI = ((String) score.call("tokenURI", newId)) + "_updated";

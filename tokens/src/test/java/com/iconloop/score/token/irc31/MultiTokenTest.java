@@ -37,19 +37,19 @@ public class MultiTokenTest extends TestBase {
     protected static final BigInteger EXA = BigInteger.TEN.pow(18);
 
     protected static Score score;
-    protected static IRC31MinBurnToken spy;
+    protected static IRC31SampleToken spy;
 
-    void token_setup() throws Exception {
-        score = sm.deploy(owner, IRC31MinBurnToken.class);
-        spy = (IRC31MinBurnToken) spy(score.getInstance());
+    void tokenSetup() throws Exception {
+        score = sm.deploy(owner, IRC31SampleToken.class);
+        spy = (IRC31SampleToken) spy(score.getInstance());
         score.setInstance(spy);
     }
 
-    BigInteger mint_token(BigInteger supply) {
-        return mint_token(supply, owner);
+    BigInteger mintToken(BigInteger supply) {
+        return mintToken(supply, owner);
     }
 
-    BigInteger mint_token(BigInteger supply, Account account) {
+    BigInteger mintToken(BigInteger supply, Account account) {
         BigInteger newId = getTokenId();
         String uri = "https://craft.network/" + newId;
         score.invoke(owner, "mint", newId, supply, uri);
