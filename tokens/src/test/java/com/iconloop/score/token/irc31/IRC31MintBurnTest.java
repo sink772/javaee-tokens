@@ -77,8 +77,7 @@ public class IRC31MintBurnTest extends MultiTokenTest {
         BigInteger supply = BigInteger.valueOf((int) (Math.random() * 100 + 2));
         BigInteger newId = mintToken(supply);
 
-        BigInteger burn_amount = supply;
-        score.invoke(owner, "burn", newId, burn_amount);
+        score.invoke(owner, "burn", newId, supply);
     }
 
     @Test

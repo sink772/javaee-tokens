@@ -29,12 +29,9 @@ public class MultiTokenTest extends TestBase {
 
     protected static final ServiceManager sm = getServiceManager();
     protected static final Account owner = sm.createAccount();
-    protected static final Account minter = sm.createAccount();
-    protected static final Account burner = sm.createAccount();
     protected static final Account alice = sm.createAccount();
     protected static final Account bob = sm.createAccount();
     protected static final Account eve = sm.createAccount();
-    protected static final BigInteger EXA = BigInteger.TEN.pow(18);
 
     protected static Score score;
     protected static IRC31SampleToken spy;
