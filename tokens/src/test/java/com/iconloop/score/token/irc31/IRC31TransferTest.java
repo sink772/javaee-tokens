@@ -46,8 +46,8 @@ public class IRC31TransferTest extends MultiTokenTest {
 
         // transfer ownership
         assertThrows(AssertionError.class, () ->
-                score.invoke(owner, "transferFrom",
-                        owner.getAddress(),
+                score.invoke(alice, "transferFrom",
+                        alice.getAddress(),
                         IRC31Basic.ZERO_ADDRESS,
                         newId,
                         supply,
@@ -57,7 +57,7 @@ public class IRC31TransferTest extends MultiTokenTest {
     @Test
     void testTransferFromTooMuch() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mintToken(supply, alice);
+        BigInteger newId = mintToken(supply);
 
         // transfer ownership
         assertThrows(AssertionError.class, () ->
@@ -72,7 +72,7 @@ public class IRC31TransferTest extends MultiTokenTest {
     @Test
     void testTransferFrom() {
         BigInteger supply = BigInteger.valueOf(100);
-        BigInteger newId = mintToken(supply, alice);
+        BigInteger newId = mintToken(supply);
         reset(spy);
 
         // transfer ownership

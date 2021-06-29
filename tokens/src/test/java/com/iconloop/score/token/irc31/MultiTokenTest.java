@@ -52,7 +52,7 @@ public class MultiTokenTest extends TestBase {
     BigInteger mintToken(BigInteger supply, Account account) {
         BigInteger newId = getTokenId();
         String uri = "https://craft.network/" + newId;
-        score.invoke(owner, "mint", newId, supply, uri);
+        score.invoke(account, "mint", newId, supply, uri);
         return newId;
     }
 
