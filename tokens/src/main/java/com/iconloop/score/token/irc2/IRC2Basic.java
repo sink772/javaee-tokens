@@ -40,8 +40,8 @@ public abstract class IRC2Basic implements IRC2 {
         this.decimals = _decimals;
 
         // decimals must be larger than 0 and less than 21
-        Context.require(this.decimals >= 0);
-        Context.require(this.decimals <= 21);
+        Context.require(this.decimals >= 0, "decimals needs to be positive");
+        Context.require(this.decimals <= 21, "decimals needs to be equal or lower than 21");
     }
 
     @External(readonly=true)
@@ -74,8 +74,8 @@ public abstract class IRC2Basic implements IRC2 {
         Address _from = Context.getCaller();
 
         // check some basic requirements
-        Context.require(_value.compareTo(BigInteger.ZERO) >= 0);
-        Context.require(safeGetBalance(_from).compareTo(_value) >= 0);
+        Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "_value needs to be positive");
+        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, "Insufficient balance");
 
         // adjust the balances
         safeSetBalance(_from, safeGetBalance(_from).subtract(_value));
@@ -95,8 +95,8 @@ public abstract class IRC2Basic implements IRC2 {
      * Creates `amount` tokens and assigns them to `owner`, increasing the total supply.
      */
     protected void _mint(Address owner, BigInteger amount) {
-        Context.require(!ZERO_ADDRESS.equals(owner));
-        Context.require(amount.compareTo(BigInteger.ZERO) >= 0);
+        Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
+        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
 
         totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).add(amount));
         safeSetBalance(owner, safeGetBalance(owner).add(amount));
@@ -107,9 +107,9 @@ public abstract class IRC2Basic implements IRC2 {
      * Destroys `amount` tokens from `owner`, reducing the total supply.
      */
     protected void _burn(Address owner, BigInteger amount) {
-        Context.require(!ZERO_ADDRESS.equals(owner));
-        Context.require(amount.compareTo(BigInteger.ZERO) >= 0);
-        Context.require(safeGetBalance(owner).compareTo(amount) >= 0);
+        Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
+        Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
+        Context.require(safeGetBalance(owner).compareTo(amount) >= 0, "Insufficient balance");
 
         safeSetBalance(owner, safeGetBalance(owner).subtract(amount));
         totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).subtract(amount));
