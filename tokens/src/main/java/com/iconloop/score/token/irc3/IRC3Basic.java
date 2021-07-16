@@ -51,7 +51,7 @@ public abstract class IRC3Basic implements IRC3 {
 
     @External(readonly=true)
     public int balanceOf(Address _owner) {
-        Context.require(!ZERO_ADDRESS.equals(_owner));
+        Context.require(!ZERO_ADDRESS.equals(_owner), "Owner address cannot be zero address");
         var tokens = holderTokens.get(_owner);
         return (tokens != null) ? tokens.length() : 0;
     }
@@ -69,8 +69,8 @@ public abstract class IRC3Basic implements IRC3 {
     @External
     public void approve(Address _to, BigInteger _tokenId) {
         Address owner = ownerOf(_tokenId);
-        Context.require(!owner.equals(_to));
-        Context.require(owner.equals(Context.getCaller()));
+        Context.require(!owner.equals(_to), "Cannot approve owner");
+        Context.require(owner.equals(Context.getCaller()), "Only owner can call this method");
         _approve(_to, _tokenId);
     }
 
@@ -82,7 +82,7 @@ public abstract class IRC3Basic implements IRC3 {
     @External
     public void transfer(Address _to, BigInteger _tokenId) {
         Address owner = ownerOf(_tokenId);
-        Context.require(owner.equals(Context.getCaller()));
+        Context.require(owner.equals(Context.getCaller()), "Only owner can call this method");
         _transfer(owner, _to, _tokenId);
     }
 
@@ -90,13 +90,13 @@ public abstract class IRC3Basic implements IRC3 {
     public void transferFrom(Address _from, Address _to, BigInteger _tokenId) {
         Address owner = ownerOf(_tokenId);
         Address spender = Context.getCaller();
-        Context.require(owner.equals(spender) || getApproved(_tokenId).equals(spender));
+        Context.require(owner.equals(spender) || getApproved(_tokenId).equals(spender), "Spender is not authorized to transfer tokens");
         _transfer(_from, _to, _tokenId);
     }
 
     private void _transfer(Address from, Address to, BigInteger tokenId) {
-        Context.require(ownerOf(tokenId).equals(from));
-        Context.require(!to.equals(ZERO_ADDRESS));
+        Context.require(ownerOf(tokenId).equals(from), "from address is not owner");
+        Context.require(!to.equals(ZERO_ADDRESS), "destination address cannot be zero address");
         // clear approvals from the previous owner
         _approve(ZERO_ADDRESS, tokenId);
 
@@ -137,8 +137,8 @@ public abstract class IRC3Basic implements IRC3 {
      * Mints `tokenId` and transfers it to `to`.
      */
     protected void _mint(Address to, BigInteger tokenId) {
-        Context.require(!ZERO_ADDRESS.equals(to));
-        Context.require(!_tokenExists(tokenId));
+        Context.require(!ZERO_ADDRESS.equals(to), "Destination address cannot be zero address");
+        Context.require(!_tokenExists(tokenId), "Token already exists");
 
         _addTokenTo(tokenId, to);
         tokenOwners.set(tokenId, to);
@@ -173,7 +173,7 @@ public abstract class IRC3Basic implements IRC3 {
 
     private void _removeTokenFrom(BigInteger tokenId, Address from) {
         var tokens = holderTokens.get(from);
-        Context.require(tokens != null);
+        Context.require(tokens != null, "tokens don't exist for this address");
         tokens.remove(tokenId);
         if (tokens.length() == 0) {
             holderTokens.set(from, null);
