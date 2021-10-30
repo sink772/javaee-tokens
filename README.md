@@ -3,8 +3,9 @@
 # A Java SCORE Library for ICON Standard Tokens
 
 This repository contains a Java SCORE library for ICON standard tokens like
-[IRC2](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-2.md) and
-[IRC3](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-3.md).
+[IRC2](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-2.md),
+[IRC3](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-3.md), and
+[IRC31](https://github.com/icon-project/IIPs/blob/master/IIPS/iip-31.md).
 SCORE developers are no longer required to write the whole things from scratch.
 This project provides reusable Java classes to build custom user contracts conveniently.
 
@@ -14,7 +15,7 @@ You can include this package from [Maven Central](https://search.maven.org/searc
 by adding the following dependency in your `build.gradle`.
 
 ```groovy
-implementation 'com.github.sink772:javaee-tokens:0.6.0'
+implementation 'com.github.sink772:javaee-tokens:0.6.1'
 ```
 
 You need to create a entry Java class to inherit the attributes and methods from the basic token classes.
