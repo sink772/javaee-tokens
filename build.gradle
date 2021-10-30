@@ -12,9 +12,9 @@ nexusPublishing {
     packageGroup = GROUP
     repositories {
         sonatype {
-            stagingProfileId = project.hasProperty('ossrhProfileId') ? "$ossrhProfileId" : ''
-            username = project.hasProperty('ossrhUsername') ? "$ossrhUsername" : ''
-            password = project.hasProperty('ossrhPassword') ? "$ossrhPassword" : ''
+            stagingProfileId = findProperty('ossrhProfileId') ?: System.getenv("STAGING_PROFILE_ID")
+            username = findProperty('ossrhUsername') ?: System.getenv("OSSRH_USERNAME")
+            password = findProperty('ossrhPassword') ?: System.getenv("OSSRH_PASSWORD")
         }
     }
 }
