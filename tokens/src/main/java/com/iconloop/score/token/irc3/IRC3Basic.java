@@ -158,7 +158,7 @@ public abstract class IRC3Basic implements IRC3 {
         Transfer(owner, ZERO_ADDRESS, tokenId);
     }
 
-    private boolean _tokenExists(BigInteger tokenId) {
+    protected boolean _tokenExists(BigInteger tokenId) {
         return tokenOwners.contains(tokenId);
     }
 
