@@ -75,7 +75,11 @@ public abstract class IRC2Basic implements IRC2 {
 
     @External(readonly=true)
     public BigInteger balanceOf(Address _owner) {
-        return safeGetBalance(_owner);
+        return balances.getOrDefault(_owner, BigInteger.ZERO);
+    }
+
+    private void safeSetBalance(Address owner, BigInteger amount) {
+        balances.set(owner, amount);
     }
 
     @External
@@ -84,11 +88,11 @@ public abstract class IRC2Basic implements IRC2 {
 
         // check some basic requirements
         Context.require(_value.compareTo(BigInteger.ZERO) >= 0, "_value needs to be positive");
-        Context.require(safeGetBalance(_from).compareTo(_value) >= 0, "Insufficient balance");
+        Context.require(balanceOf(_from).compareTo(_value) >= 0, "Insufficient balance");
 
         // adjust the balances
-        safeSetBalance(_from, safeGetBalance(_from).subtract(_value));
-        safeSetBalance(_to, safeGetBalance(_to).add(_value));
+        safeSetBalance(_from, balanceOf(_from).subtract(_value));
+        safeSetBalance(_to, balanceOf(_to).add(_value));
 
         // emit Transfer event first
         byte[] dataBytes = (_data == null) ? new byte[0] : _data;
@@ -106,8 +110,8 @@ public abstract class IRC2Basic implements IRC2 {
         Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
         Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
 
-        totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).add(amount));
-        safeSetBalance(owner, safeGetBalance(owner).add(amount));
+        totalSupply.set(totalSupply().add(amount));
+        safeSetBalance(owner, balanceOf(owner).add(amount));
         Transfer(ZERO_ADDRESS, owner, amount, "mint".getBytes());
     }
 
@@ -117,19 +121,11 @@ public abstract class IRC2Basic implements IRC2 {
     protected void _burn(Address owner, BigInteger amount) {
         Context.require(!ZERO_ADDRESS.equals(owner), "Owner address cannot be zero address");
         Context.require(amount.compareTo(BigInteger.ZERO) >= 0, "amount needs to be positive");
-        Context.require(safeGetBalance(owner).compareTo(amount) >= 0, "Insufficient balance");
+        Context.require(balanceOf(owner).compareTo(amount) >= 0, "Insufficient balance");
 
-        safeSetBalance(owner, safeGetBalance(owner).subtract(amount));
-        totalSupply.set(totalSupply.getOrDefault(BigInteger.ZERO).subtract(amount));
+        safeSetBalance(owner, balanceOf(owner).subtract(amount));
+        totalSupply.set(totalSupply().subtract(amount));
         Transfer(owner, ZERO_ADDRESS, amount, "burn".getBytes());
-    }
-
-    private BigInteger safeGetBalance(Address owner) {
-        return balances.getOrDefault(owner, BigInteger.ZERO);
-    }
-
-    private void safeSetBalance(Address owner, BigInteger amount) {
-        balances.set(owner, amount);
     }
 
     @EventLog(indexed=3)
