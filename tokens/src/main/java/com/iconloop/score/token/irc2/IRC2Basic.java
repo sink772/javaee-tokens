@@ -90,14 +90,13 @@ public abstract class IRC2Basic implements IRC2 {
         safeSetBalance(_from, safeGetBalance(_from).subtract(_value));
         safeSetBalance(_to, safeGetBalance(_to).add(_value));
 
-        // if the recipient is SCORE, call 'tokenFallback' to handle further operation
+        // emit Transfer event first
         byte[] dataBytes = (_data == null) ? new byte[0] : _data;
+        Transfer(_from, _to, _value, dataBytes);
+        // if the recipient is SCORE, call 'tokenFallback' to handle further operation
         if (_to.isContract()) {
             Context.call(_to, "tokenFallback", _from, _value, dataBytes);
         }
-
-        // emit Transfer event
-        Transfer(_from, _to, _value, dataBytes);
     }
 
     /**
