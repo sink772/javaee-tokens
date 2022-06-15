@@ -19,34 +19,32 @@ package com.iconloop.score.util;
 import score.Context;
 import score.DictDB;
 
-import java.math.BigInteger;
+public class EnumerableMap<K, V> {
+    private final EnumerableSet<K> keys;
+    private final DictDB<K, V> values;
 
-public class EnumerableIntMap<V> {
-    private final EnumerableSet<BigInteger> keys;
-    private final DictDB<BigInteger, V> values;
-
-    public EnumerableIntMap(String id, Class<V> valueClass) {
-        this.keys = new EnumerableSet<>(id + "_keys", BigInteger.class);
-        this.values = Context.newDictDB(id, valueClass);
+    public EnumerableMap(String id, Class<K> keyClass, Class<V> valueClass) {
+        this.keys = new EnumerableSet<>(id + "_keys", keyClass);
+        this.values = Context.newDictDB(id + "_values", valueClass);
     }
 
     public int length() {
         return keys.length();
     }
 
-    public boolean contains(BigInteger key) {
+    public boolean contains(K key) {
         return keys.contains(key);
     }
 
-    public BigInteger getKey(int index) {
+    public K getKey(int index) {
         return keys.at(index);
     }
 
-    public V get(BigInteger key) {
+    public V get(K key) {
         return values.get(key);
     }
 
-    public V getOrThrow(BigInteger key, String msg) {
+    public V getOrThrow(K key, String msg) {
         var entry = this.get(key);
         if (entry != null) {
             return entry;
@@ -55,12 +53,12 @@ public class EnumerableIntMap<V> {
         return null; // should not reach here, but made compiler happy
     }
 
-    public void set(BigInteger key, V value) {
+    public void set(K key, V value) {
         values.set(key, value);
         keys.add(key);
     }
 
-    public void remove(BigInteger key) {
+    public void remove(K key) {
         values.set(key, null);
         keys.remove(key);
     }

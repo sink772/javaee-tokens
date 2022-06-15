@@ -26,9 +26,9 @@ public class EnumerableSet<V> {
 
     public EnumerableSet(String id, Class<V> valueClass) {
         // array of valueClass
-        this.entries = Context.newArrayDB(id, valueClass);
+        this.entries = Context.newArrayDB(id + "_entries", valueClass);
         // value => array index
-        this.indexes = Context.newDictDB(id, Integer.class);
+        this.indexes = Context.newDictDB(id + "_indexes", Integer.class);
     }
 
     public int length() {

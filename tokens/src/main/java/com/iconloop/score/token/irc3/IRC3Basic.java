@@ -16,7 +16,7 @@
 
 package com.iconloop.score.token.irc3;
 
-import com.iconloop.score.util.EnumerableIntMap;
+import com.iconloop.score.util.EnumerableMap;
 import com.iconloop.score.util.IntSet;
 import score.Address;
 import score.Context;
@@ -31,7 +31,7 @@ public abstract class IRC3Basic implements IRC3 {
     private final String name;
     private final String symbol;
     private final DictDB<Address, IntSet> holderTokens = Context.newDictDB("holders", IntSet.class);
-    private final EnumerableIntMap<Address> tokenOwners = new EnumerableIntMap<>("owners", Address.class);
+    private final EnumerableMap<BigInteger, Address> tokenOwners = new EnumerableMap<>("owners", BigInteger.class, Address.class);
     private final DictDB<BigInteger, Address> tokenApprovals = Context.newDictDB("approvals", Address.class);
 
     public IRC3Basic(String _name, String _symbol) {
