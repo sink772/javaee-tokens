@@ -21,6 +21,7 @@ import com.iconloop.score.util.IntSet;
 import score.Address;
 import score.Context;
 import score.DictDB;
+import score.VarDB;
 import score.annotation.EventLog;
 import score.annotation.External;
 
@@ -28,25 +29,28 @@ import java.math.BigInteger;
 
 public abstract class IRC3Basic implements IRC3 {
     protected static final Address ZERO_ADDRESS = new Address(new byte[Address.LENGTH]);
-    private final String name;
-    private final String symbol;
+    private final VarDB<String> name = Context.newVarDB("name", String.class);
+    private final VarDB<String> symbol = Context.newVarDB("symbol", String.class);
     private final DictDB<Address, IntSet> holderTokens = Context.newDictDB("holders", IntSet.class);
     private final EnumerableMap<BigInteger, Address> tokenOwners = new EnumerableMap<>("owners", BigInteger.class, Address.class);
     private final DictDB<BigInteger, Address> tokenApprovals = Context.newDictDB("approvals", Address.class);
 
     public IRC3Basic(String _name, String _symbol) {
-        this.name = _name;
-        this.symbol = _symbol;
+        // initialize values only at first deployment
+        if (this.name.get() == null) {
+            this.name.set(_name);
+            this.symbol.set(_symbol);
+        }
     }
 
     @External(readonly=true)
     public String name() {
-        return name;
+        return name.get();
     }
 
     @External(readonly=true)
     public String symbol() {
-        return symbol;
+        return symbol.get();
     }
 
     @External(readonly=true)
