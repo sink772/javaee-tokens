@@ -78,7 +78,7 @@ public abstract class IRC31Basic implements IRC31 {
                 "_to must be non-zero");
         Context.require(_from.equals(caller) || this.isApprovedForAll(_from, caller),
                 "Need operator approval for 3rd party transfers");
-        Context.require(BigInteger.ZERO.compareTo(_value) <= 0 && _value.compareTo(balanceOf(_from, _id)) <= 0,
+        Context.require(_value.signum() >= 0 && balanceOf(_from, _id).compareTo(_value) >= 0,
                 "Insufficient funds");
 
         // Transfer funds
@@ -109,20 +109,13 @@ public abstract class IRC31Basic implements IRC31 {
         for (int i = 0; i < _ids.length; i++) {
             BigInteger _id = _ids[i];
             BigInteger _value = _values[i];
-
-            Context.require(_value.compareTo(BigInteger.ZERO) >= 0,
-                    "Insufficient funds");
-
-            BigInteger balanceFrom = balanceOf(_from, _id);
-
-            Context.require(_value.compareTo(balanceFrom) <= 0,
+            Context.require(_value.signum() >= 0 && balanceOf(_from, _id).compareTo(_value) >= 0,
                     "Insufficient funds");
 
             // Transfer funds
-            BigInteger balanceTo = balanceOf(_to, _id);
             DictDB<Address, BigInteger> balance = balances.at(_id);
-            balance.set(_from, balanceFrom.subtract(_value));
-            balance.set(_to, balanceTo.add(_value));
+            balance.set(_from, balanceOf(_from, _id).subtract(_value));
+            balance.set(_to, balanceOf(_to, _id).add(_value));
         }
 
         // Emit event

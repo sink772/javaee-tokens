@@ -26,6 +26,7 @@ import score.UserRevertedException;
 
 import java.math.BigInteger;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.reset;
@@ -68,6 +69,17 @@ public class IRC31TransferTest extends MultiTokenTest {
                         newId,
                         supply.add(BigInteger.ONE),
                         "test".getBytes()));
+    }
+
+    @Test
+    void testSelfTransfer() {
+        BigInteger supply = BigInteger.valueOf(100);
+        BigInteger newId = mintToken(supply, alice);
+
+        assertEquals(supply, score.call("balanceOf", alice.getAddress(), newId));
+        score.invoke(alice, "transferFrom", alice.getAddress(), alice.getAddress(),
+                newId, supply, "test".getBytes());
+        assertEquals(supply, score.call("balanceOf", alice.getAddress(), newId));
     }
 
     @Test
@@ -284,5 +296,25 @@ public class IRC31TransferTest extends MultiTokenTest {
         // transfer ownership
         assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFromBatch", owner.getAddress(), alice.getAddress(), ids, values, "test".getBytes()));
+    }
+
+    @Test
+    void testSelfTransferBatch() {
+        BigInteger[] values = {
+                BigInteger.valueOf(50),
+                BigInteger.valueOf(100),
+                BigInteger.valueOf(200),
+        };
+        Address[] owners = new Address[values.length];
+        BigInteger[] ids = new BigInteger[values.length];
+        for (int i = 0; i < ids.length; i++) {
+            owners[i] = alice.getAddress();
+            ids[i] = mintToken(values[i], alice);
+        }
+
+        assertArrayEquals(values, score.call(BigInteger[].class, "balanceOfBatch", owners, ids));
+        score.invoke(alice, "transferFromBatch", alice.getAddress(), alice.getAddress(),
+                ids, values, "test".getBytes());
+        assertArrayEquals(values, score.call(BigInteger[].class, "balanceOfBatch", owners, ids));
     }
 }
