@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import score.Address;
 import score.Context;
+import score.UserRevertedException;
 import score.annotation.External;
 
 import java.math.BigInteger;
@@ -133,7 +134,7 @@ public class IRC3BasicTest extends TestBase {
         var tokenId = mintToken();
         var alice = sm.createAccount();
         var bob = sm.createAccount();
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 tokenScore.invoke(alice, "transferFrom", owner.getAddress(), bob.getAddress(), tokenId));
         approveToken(owner, alice.getAddress(), tokenId);
         assertDoesNotThrow(() ->
@@ -151,7 +152,7 @@ public class IRC3BasicTest extends TestBase {
         var tokenId2 = mintToken();
         var alice = sm.createAccount();
         tokenScore.invoke(owner, "transfer", alice.getAddress(), tokenId);
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 tokenScore.invoke(owner, "burn", tokenId));
         assertDoesNotThrow(() ->
                 tokenScore.invoke(alice, "burn", tokenId));

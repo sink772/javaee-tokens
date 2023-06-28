@@ -19,6 +19,7 @@ package com.iconloop.score.token.irc31;
 import com.iconloop.score.test.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import score.UserRevertedException;
 
 import java.math.BigInteger;
 
@@ -52,13 +53,13 @@ public class IRC31MintBurnTest extends MultiTokenTest {
         BigInteger newId = mintToken(supply);
 
         // mint with the existing id
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "mint", newId, supply, "uri"));
     }
 
     @Test
     void testBurnInvalidToken() {
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "burn", getTokenId(), BigInteger.ONE));
     }
 
@@ -87,7 +88,7 @@ public class IRC31MintBurnTest extends MultiTokenTest {
 
         // burn with creator
         BigInteger burn_amount = supply.add(BigInteger.ONE);
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "burn", newId, burn_amount));
     }
 
@@ -98,7 +99,7 @@ public class IRC31MintBurnTest extends MultiTokenTest {
 
         // burn with eve
         BigInteger burn_amount = BigInteger.ONE;
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(eve, "burn", newId, burn_amount));
     }
 

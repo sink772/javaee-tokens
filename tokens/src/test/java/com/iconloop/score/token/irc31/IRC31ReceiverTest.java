@@ -24,9 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import score.Address;
+import score.UserRevertedException;
 
 import java.math.BigInteger;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.reset;
@@ -82,13 +84,13 @@ public class IRC31ReceiverTest extends TestBase {
 
     @Test
     void testSetOriginatorNotOwner() {
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 scoreRcv.invoke(bob, "setOriginator", scoreToken.getAddress(), true));
     }
 
     @Test
     void testSetOriginatorInvalidContractAddress() {
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 scoreRcv.invoke(owner, "setOriginator", alice.getAddress(), true));
     }
 
@@ -161,7 +163,7 @@ public class IRC31ReceiverTest extends TestBase {
         assertEquals(from.getValue(), owner.getAddress());
         assertEquals(id.getValue(), newId);
         assertEquals(value.getValue(), newSupply);
-        assertEquals(dataCaptor.getValue(), data);
+        assertArrayEquals(dataCaptor.getValue(), data);
     }
 
     @Test

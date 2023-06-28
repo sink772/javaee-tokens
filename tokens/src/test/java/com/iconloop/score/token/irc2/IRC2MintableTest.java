@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import score.Address;
 import score.Context;
+import score.UserRevertedException;
 
 import java.math.BigInteger;
 
@@ -99,14 +100,14 @@ public class IRC2MintableTest extends TestBase {
     void mintEve() {
         // mint 10 token but fail, eve is not owner
         BigInteger amount = TEN.pow(decimals);
-        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mint", amount));
+        assertThrows(UserRevertedException.class, () -> tokenScore.invoke(eve, "mint", amount));
     }
 
     @Test
     void mintToEve() {
         // mint 10 token to Alice but fail, eve is not owner
         BigInteger amount = TEN.pow(decimals);
-        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mintTo", alice.getAddress(), amount));
+        assertThrows(UserRevertedException.class, () -> tokenScore.invoke(eve, "mintTo", alice.getAddress(), amount));
     }
 
     @Test
@@ -116,8 +117,8 @@ public class IRC2MintableTest extends TestBase {
 
         // owner shouldn't be able to mint anymore
         BigInteger amount = TEN.pow(decimals);
-        assertThrows(AssertionError.class, () -> tokenScore.invoke(owner, "mint", amount));
-        assertThrows(AssertionError.class, () -> tokenScore.invoke(eve, "mint", amount));
+        assertThrows(UserRevertedException.class, () -> tokenScore.invoke(owner, "mint", amount));
+        assertThrows(UserRevertedException.class, () -> tokenScore.invoke(eve, "mint", amount));
 
         // Change the minter role back to owner
         tokenScore.invoke(owner, "setMinter", owner.getAddress());

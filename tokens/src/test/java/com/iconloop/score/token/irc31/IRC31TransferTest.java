@@ -22,6 +22,7 @@ import org.mockito.ArgumentCaptor;
 import score.Address;
 import score.Context;
 import score.ObjectReader;
+import score.UserRevertedException;
 
 import java.math.BigInteger;
 
@@ -45,7 +46,7 @@ public class IRC31TransferTest extends MultiTokenTest {
         BigInteger newId = mintToken(supply, alice);
 
         // transfer ownership
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(alice, "transferFrom",
                         alice.getAddress(),
                         IRC31Basic.ZERO_ADDRESS,
@@ -60,7 +61,7 @@ public class IRC31TransferTest extends MultiTokenTest {
         BigInteger newId = mintToken(supply);
 
         // transfer ownership
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFrom",
                         owner.getAddress(),
                         alice.getAddress(),
@@ -117,7 +118,7 @@ public class IRC31TransferTest extends MultiTokenTest {
         assertEquals(supply, score.call("balanceOf", alice.getAddress(), newId));
 
         // fail case: alice => bob by owner
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFrom",
                         alice.getAddress(),
                         bob.getAddress(),
@@ -163,7 +164,7 @@ public class IRC31TransferTest extends MultiTokenTest {
         // fail case: alice => bob by owner
         BigInteger[] values2 = {BigInteger.valueOf(10), BigInteger.valueOf(20), BigInteger.valueOf(30)};
 
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFromBatch", alice.getAddress(), bob.getAddress(), ids, values2, "test".getBytes()));
 
 
@@ -250,7 +251,7 @@ public class IRC31TransferTest extends MultiTokenTest {
 
         BigInteger[] values = {BigInteger.valueOf(50), BigInteger.valueOf(60), BigInteger.valueOf(70)};
 
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFromBatch", owner.getAddress(), IRC31Basic.ZERO_ADDRESS, ids, values, "test".getBytes()));
     }
 
@@ -265,7 +266,7 @@ public class IRC31TransferTest extends MultiTokenTest {
 
         BigInteger[] values = {BigInteger.valueOf(50)};
 
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFromBatch", owner.getAddress(), alice.getAddress(), ids, values, "test".getBytes()));
     }
 
@@ -281,7 +282,7 @@ public class IRC31TransferTest extends MultiTokenTest {
         BigInteger[] values = {BigInteger.valueOf(50), supply.add(BigInteger.ONE), BigInteger.valueOf(70)};
 
         // transfer ownership
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(owner, "transferFromBatch", owner.getAddress(), alice.getAddress(), ids, values, "test".getBytes()));
     }
 }

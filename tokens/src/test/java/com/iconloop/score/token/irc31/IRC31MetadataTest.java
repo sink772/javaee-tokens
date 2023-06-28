@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import score.Address;
+import score.UserRevertedException;
 
 import java.math.BigInteger;
 
@@ -114,7 +115,7 @@ public class IRC31MetadataTest extends MultiTokenTest {
         reset(spy);
 
         String newURI = ((String) score.call("tokenURI", newId)) + "_updated";
-        assertThrows(AssertionError.class, () ->
+        assertThrows(UserRevertedException.class, () ->
                 score.invoke(eve, "setTokenURI", newId, newURI));
     }
 }
