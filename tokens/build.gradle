@@ -10,12 +10,12 @@ java {
 }
 
 dependencies {
-    compileOnly 'foundation.icon:javaee-api:0.9.4'
+    compileOnly 'foundation.icon:javaee-api:0.9.6'
 
-    testImplementation 'foundation.icon:javaee-unittest:0.11.1'
-    testImplementation 'org.mockito:mockito-core:4.8.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testImplementation 'foundation.icon:javaee-unittest:0.12.2'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
 }
 
 compileJava {
@@ -27,13 +27,15 @@ test {
     useJUnitPlatform()
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier 'sources'
+tasks.register('sourcesJar', Jar) {
+    dependsOn classes
+    archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier 'javadoc'
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
